@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.hydok.andoridcompose.ui.OrderViewModel
@@ -19,6 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.hydok.andoridcompose.data.DataSource
+import io.hydok.andoridcompose.data.DataSource.flavors
+import io.hydok.andoridcompose.ui.SelectOptionScreen
 import io.hydok.andoridcompose.ui.StartOrderScreen
 
 @Composable
@@ -59,7 +62,16 @@ fun MainApp(
             }
 
             composable(route = CupcakeScreen.Flavor.name) {
-
+                val context = LocalContext.current
+                SelectOptionScreen(
+                    subtotal = uiState.price,
+                    onNextButtonClicked = { navController.navigate(CupcakeScreen.Pickup.name) },
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(viewModel, navController)
+                    },
+                    options = flavors.map { id -> context.resources.getString(id) },
+                    onSelectionChanged = { viewModel.setFlavor(it) }
+                )
             }
 
             composable(route = CupcakeScreen.Pickup.name) {
@@ -76,6 +88,13 @@ fun MainApp(
     }
 
 
+}
+private fun cancelOrderAndNavigateToStart(
+    viewModel: OrderViewModel,
+    navController: NavHostController
+) {
+    viewModel.resetOrder()
+    navController.popBackStack(CupcakeScreen.Start.name, inclusive = false)
 }
 
 @Composable

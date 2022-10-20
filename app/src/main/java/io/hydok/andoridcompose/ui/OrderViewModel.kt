@@ -32,6 +32,14 @@ class OrderViewModel : ViewModel() {
 
 
 
+    fun resetOrder() {
+        _uiState.value = OrderUiState(pickupOptions = pickupOptions())
+    }
+    fun setFlavor(desiredFlavor: String) {
+        _uiState.update { currentState ->
+            currentState.copy(flavor = desiredFlavor)
+        }
+    }
 
     private fun calculatePrice(
         quantity: Int = _uiState.value.quantity,

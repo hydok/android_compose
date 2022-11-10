@@ -46,22 +46,32 @@ class OrderViewModel : ViewModel() {
         pickupDate: String = _uiState.value.date
     ): String {
         var calculatedPrice = quantity * PRICE_PER_CUPCAKE
-        // If the user selected the first option (today) for pickup, add the surcharge
+
         if (pickupOptions()[0] == pickupDate) {
             calculatedPrice += PRICE_FOR_SAME_DAY_PICKUP
         }
-        val formattedPrice = NumberFormat.getCurrencyInstance().format(calculatedPrice)
-        return formattedPrice
+        return NumberFormat.getCurrencyInstance().format(calculatedPrice)
     }
+
+    //픽업 날짜 설정
     private fun pickupOptions(): List<String> {
         val dateOptions = mutableListOf<String>()
-        val formatter = SimpleDateFormat("E MMM d", Locale.getDefault())
+        val formatter = SimpleDateFormat("MM월 dd일 E요일", Locale.getDefault())
         val calendar = Calendar.getInstance()
-        // add current date and the following 3 dates.
-        repeat(4) {
+
+        repeat(7) {
             dateOptions.add(formatter.format(calendar.time))
             calendar.add(Calendar.DATE, 1)
         }
         return dateOptions
+    }
+
+    fun setDate(pickupDate: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                date = pickupDate,
+                price = calculatePrice(pickupDate = pickupDate)
+            )
+        }
     }
 }
